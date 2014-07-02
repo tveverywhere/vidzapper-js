@@ -10,7 +10,7 @@
   "bugs": {
     "url": "https://github.com/tveverywhere/vidzaper-nodejs-api/issues"
   },
-  "main": "app",
+  "main": "vidzapper",
   "readmeFilename": "README.md",
   "dependencies": {
     "request": "~2.33.0",
