@@ -1,0 +1,19 @@
+{
+  "name": "vidzapper",
+  "version": "0.1.1",
+  "description": "VidZapper API Package",
+  "author": "Anuj Pandey <a@e10.in> (http://e10.in)",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/tveverywhere/vidzapper-nodejs-api.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tveverywhere/vidzaper-nodejs-api/issues"
+  },
+  "main": "app",
+  "readmeFilename": "README.md",
+  "dependencies": {
+    "request": "~2.33.0",
+    "moment": "~2.5.1"
+  }
+}
