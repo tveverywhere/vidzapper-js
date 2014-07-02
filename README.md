@@ -10,7 +10,7 @@ Configurations
 var opt={
 	id:'YOUR API KEY',
 	secret:'YOUR API SECRET',
-	server:'https://release.vzconsole.com/api/'
+	server:'YOUR VIDZAPPER API URL'
 }
 ```
 
