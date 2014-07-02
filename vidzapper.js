@@ -1,10 +1,8 @@
 var crypto = require('crypto'),
     request = require('request'),
-    util = require('util'),
     moment = require('moment');
-
-var VidZapperApi = function(opt) {
-    var _parseUrl = function(url, params) {
+var VidZapperApi = function (opt) {
+    var _parseUrl = function (url, params) {
         if (!params) {
             params = "";
         } else {
@@ -20,9 +18,19 @@ var VidZapperApi = function(opt) {
         var tmp = opt.secret.substring(0, opt.secret.indexOf('r') + 1) + tmpKey + '/' + url;
         return tmp + params;
     };
-    this.api = function(url, params, callback) {
-
-        var method = "POST";
+    VidZapperApi.prototype.init = function(cfg) {
+        opt=cfg;
+    };
+    VidZapperApi.prototype.get = function(url,params,callback) {
+      return _apicore(url,params,'GET',callback);         
+    };
+    VidZapperApi.prototype.api = function(url,params,callback) {
+      return _apicore(url,params,'POST',callback);         
+    };
+    VidZapperApi.prototype.post = function(url,params,callback) {
+      return _apicore(url,params,'POST',callback);         
+    };
+    var _apicore= function (url, params,method, callback) {
 
         if (typeof params === 'function') {
             callback = params;
@@ -30,7 +38,20 @@ var VidZapperApi = function(opt) {
             method = "GET";
         }
 
-        var options = { method: method, json: {}, rejectUnauthorized: false };
+        var headers = {
+            'user-agent': 'VidZapper Api Node JS/0.0.1',
+            'content-type': 'application/json; charset=utf-8',
+            //'accept-encoding':'gzip,deflate'
+        }
+
+        var options = {
+            method: method,
+            json: {},
+            header:headers,
+            rejectUnauthorized: false
+        };
+
+        var fName=opt.server +'my/'+ url+(method == 'GET'?'?'+params:'');
 
         if (method == 'POST') {
             options.json = params;
@@ -40,30 +61,40 @@ var VidZapperApi = function(opt) {
         }
 
         url = opt.server + url;
+        options.url=url;
+        if(!!opt.debug){
+            console.log('connecting',fName);
+        }
 
-        var req = request(url, options, function(error, response, body) {
+        request(options,function(error,response,body){
             if (response === null || response === undefined) {
-                callback({ error: true, message: "VidZapper.Api.Error: Request failed without a response. Network Connected? ", more: error, body: body, response: response });
+                callback({
+                    error: true,
+                    message: "VidZapper.Api.Error: Request failed without a response. Network Connected? ",
+                    more: error,
+                    body: body,
+                    response: response
+                });
             } else if (!error && (response.statusCode >= 200 && response.statusCode < 300)) {
                 callback(body);
             } else if (!error && response.statusCode == 404) {
-                callback({ error: true, code: response.statusCode, message: "Api method not found", url: url });
+                callback({
+                    error: true,
+                    code: response.statusCode,
+                    message: "Api method not found ("+fName+")",
+                    url: url
+                });
             } else {
-                callback({ error: true, code: response.statusCode, message: body, url: url });
+                callback({
+                    error: true,
+                    code: response.statusCode,
+                    message: body,
+                    url: url
+                });
             }
         });
-
-        //console.log("request", req);
-
-        req.on('socket', function(socket) {
-            //console.log("socket", socket);
-        });
-
-        req.on('error', function(err) {
-            console.log("error", err);
-        });
-
-        //req.end();
     };
 };
-module.exports=VidZapperApi;
+exports = module.exports = function(args) {
+  return new VidZapperApi(args);
+};
