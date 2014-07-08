@@ -1,7 +1,7 @@
 VidZapper Nodejs Package
 ====================
 
-[![NPM](https://nodei.co/npm/vidzapper.png?downloads=true)](https://nodei.co/npm/vidzapper/)
+[![NPM](https://nodei.co/npm/vz.png?downloads=true)](https://nodei.co/npm/vz/)
 
 
 Nodejs API for connecting to VidZapper
