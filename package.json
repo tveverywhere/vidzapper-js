@@ -1,8 +1,12 @@
 {
   "name": "vidzapper",
-  "version": "0.1.2",
+  "version": "0.1.8",
   "description": "VidZapper API Package",
-  "author": "Anuj Pandey <a@e10.in> (http://e10.in)",
+  "author": {
+    "name": "Anuj Pandey",
+    "email": "a@e10.in",
+    "url": "http://e10.in"
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/tveverywhere/vidzapper-nodejs-api.git"
@@ -15,5 +19,12 @@
   "dependencies": {
     "request": "~2.33.0",
     "moment": "~2.5.1"
-  }
+  },
+  "readme": "VidZapper Nodejs Package\r\n====================\r\n\r\n[![NPM](https://nodei.co/npm/vidzapper.png?downloads=true)](https://nodei.co/npm/vidzapper/)\r\n\r\n\r\nNodejs API for connecting to VidZapper\r\n\r\nConfigurations\r\n-------------\r\n\r\n```javascript\r\nvar opt={\r\n\tid:'YOUR API KEY',\r\n\tsecret:'YOUR API SECRET',\r\n\tserver:'YOUR VIDZAPPER API URL'\r\n}\r\n```\r\n\r\nCalling API Method\r\n---------\r\n\r\n```javascript\r\nvar vz=new VidZapper(opt);\r\nvz.api('<<METHOD NAME>>',Post_Obj,function (d) {\r\n  if(!!d.error) throw new Error(d.message);\r\n  console.log(d);\r\n});\r\n```\r\n```javascript\r\nvar vz=new VidZapper(opt);\r\nvz.post('<<METHOD NAME>>',Post_Obj,function (d) {\r\n  if(!!d.error) throw new Error(d.message);\r\n  console.log(d);\r\n});\r\n```\r\n\r\n```javascript\r\nvar vz=new VidZapper(opt);\r\nvz.get('<<METHOD NAME>>','a=1&b=2',function (d) {\r\n  if(!!d.error) throw new Error(d.message);\r\n  console.log(d);\r\n});\r\n```\r\n\r\ncall function name vz.get2 for version 2 of the api.\r\n",
+  "gitHead": "f94e77dd51596aac5e5aca6b50a0e057d78f1b05",
+  "homepage": "https://github.com/tveverywhere/vidzapper-nodejs-api",
+  "_id": "vidzapper@0.1.4",
+  "scripts": {},
+  "_shasum": "c8027aecfe25b23769b06a57094f557f7cd93d2d",
+  "_from": "vidzapper@^0.1.2"
 }

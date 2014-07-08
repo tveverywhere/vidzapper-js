@@ -18,6 +18,7 @@ var VidZapperApi = function (opt) {
         var tmp = opt.secret.substring(0, opt.secret.indexOf('r') + 1) + tmpKey + '/' + url;
         return tmp + params;
     };
+    
     VidZapperApi.prototype.init = function(cfg) {
         opt=cfg;
     };
@@ -30,7 +31,17 @@ var VidZapperApi = function (opt) {
     VidZapperApi.prototype.post = function(url,params,callback) {
       return _apicore(url,params,'POST',callback);         
     };
-    var _apicore= function (url, params,method, callback) {
+    VidZapperApi.prototype.get2 = function(url,params,callback) {
+      return _apicore(url,params,'GET',callback,'v2');         
+    };
+    VidZapperApi.prototype.api2 = function(url,params,callback) {
+      return _apicore(url,params,'POST',callback,'v2');         
+    };
+    VidZapperApi.prototype.post2 = function(url,params,callback) {
+      return _apicore(url,params,'POST',callback,'v2');         
+    };
+
+    var _apicore= function (url, params,method, callback,v) {
 
         if (typeof params === 'function') {
             callback = params;
@@ -51,7 +62,8 @@ var VidZapperApi = function (opt) {
             rejectUnauthorized: false
         };
 
-        var fName=opt.server +'my/'+ url+(method == 'GET'?'?'+params:'');
+
+        var fName=opt.server + (v==='v2'?'v2/my/':'my/') + url+(method == 'GET'?'?'+params:'');
 
         if (method == 'POST') {
             options.json = params;
