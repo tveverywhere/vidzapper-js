@@ -42,3 +42,5 @@ vz.get('<<METHOD NAME>>','a=1&b=2',function (d) {
   console.log(d);
 });
 ```
+
+call function name vz.get2 for version 2 of the api.

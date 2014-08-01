@@ -2,7 +2,7 @@ var crypto = require('crypto'),
     request = require('request'),
     moment = require('moment');
 var VidZapperApi = function (opt) {
-    var _parseUrl = function (url, params) {
+    var _parseUrl = function (url,params) {
         if (!params) {
             params = "";
         } else {
@@ -18,6 +18,7 @@ var VidZapperApi = function (opt) {
         var tmp = opt.secret.substring(0, opt.secret.indexOf('r') + 1) + tmpKey + '/' + url;
         return tmp + params;
     };
+    
     VidZapperApi.prototype.init = function(cfg) {
         opt=cfg;
     };
@@ -30,13 +31,40 @@ var VidZapperApi = function (opt) {
     VidZapperApi.prototype.post = function(url,params,callback) {
       return _apicore(url,params,'POST',callback);         
     };
-    var _apicore= function (url, params,method, callback) {
+    VidZapperApi.prototype.get2 = function(url,params,callback) {
+      return _apicore(url,params,'GET',callback,'v2');         
+    };
+    VidZapperApi.prototype.api2 = function(url,params,callback) {
+      return _apicore(url,params,'POST',callback,'v2');         
+    };
+    VidZapperApi.prototype.post2 = function(url,params,callback) {
+      return _apicore(url,params,'POST',callback,'v2');         
+    };
+    VidZapperApi.prototype.put = function(url,params,callback) {
+      return _apicore(url,params,'PUT',callback);         
+    };
+    VidZapperApi.prototype.put2 = function(url,params,callback) {
+      return _apicore(url,params,'PUT',callback,'v2');         
+    };
+    VidZapperApi.prototype.delete = function(url,params,callback) {
+      return _apicore(url,params,'DELETE',callback);         
+    };
+
+    VidZapperApi.prototype.delete2 = function(url,params,callback) {
+      return _apicore(url,params,'DELETE',callback,'v2');         
+    };
+
+    var _noop=function(){}
+
+    var _apicore= function (url, params,method, callback,v) {
 
         if (typeof params === 'function') {
             callback = params;
             params = null;
             method = "GET";
         }
+
+        callback=callback || _noop;
 
         var headers = {
             'user-agent': 'VidZapper Api Node JS/0.0.1',
@@ -51,19 +79,21 @@ var VidZapperApi = function (opt) {
             rejectUnauthorized: false
         };
 
-        var fName=opt.server +'my/'+ url+(method == 'GET'?'?'+params:'');
 
-        if (method == 'POST') {
+        var fName=opt.server + (v==='v2'?'v2/my/':'my/') + url+(method == 'GET' && !!params?'?'+params:'');
+
+        if (method == 'POST'|| method=='PUT') {
             options.json = params;
             url = _parseUrl(url);
         } else {
             url = _parseUrl(url, params);
         }
 
-        url = opt.server + url;
+        url = opt.server +(v==='v2'?'v2/':'')+  url;
         options.url=url;
+
         if(!!opt.debug){
-            console.log('connecting',fName);
+            console.log('connecting-live',url,opt.server);
         }
 
         request(options,function(error,response,body){
