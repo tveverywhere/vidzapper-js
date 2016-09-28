@@ -2,62 +2,31 @@ var crypto = require('crypto'),
     request = require('request'),
     moment = require('moment');
 var VidZapperApi = function (opt) {
+
+    var _noop=function(){}
+
     var _parseUrl = function (url,params) {
         if (!params) {
             params = "";
         } else {
             params = "?" + params;
         }
+        if(opt.authorization) return 'my/'+url + params;
+
         var appKey = JSON.stringify({
             ValidTill: moment.utc().format("YYYYMMDDHHmm"),
             Parameters: params,
             Key: opt.id,
             Method: url
         });
-        var tmpKey = crypto.createHmac('sha1', opt.secret).update(appKey, 'utf8').digest('hex');
-        var tmp = opt.secret.substring(0, opt.secret.indexOf('r') + 1) + tmpKey + '/' + url;
+        
+        var tmp =  opt.secret.substring(0, opt.secret.indexOf('r') + 1) + crypto.createHmac('sha1', opt.secret).update(appKey, 'utf8').digest('hex') + '/' + url;
+
         return tmp + params;
     };
     
-    VidZapperApi.prototype.init = function(cfg) {
-        opt=cfg;
-    };
-    VidZapperApi.prototype.get = function(url,params,callback) {
-      return _apicore(url,params,'GET',callback);         
-    };
-    VidZapperApi.prototype.api = function(url,params,callback) {
-      return _apicore(url,params,'POST',callback);         
-    };
-    VidZapperApi.prototype.post = function(url,params,callback) {
-      return _apicore(url,params,'POST',callback);         
-    };
-    VidZapperApi.prototype.get2 = function(url,params,callback) {
-      return _apicore(url,params,'GET',callback,'v2');         
-    };
-    VidZapperApi.prototype.api2 = function(url,params,callback) {
-      return _apicore(url,params,'POST',callback,'v2');         
-    };
-    VidZapperApi.prototype.post2 = function(url,params,callback) {
-      return _apicore(url,params,'POST',callback,'v2');         
-    };
-    VidZapperApi.prototype.put = function(url,params,callback) {
-      return _apicore(url,params,'PUT',callback);         
-    };
-    VidZapperApi.prototype.put2 = function(url,params,callback) {
-      return _apicore(url,params,'PUT',callback,'v2');         
-    };
-    VidZapperApi.prototype.delete = function(url,params,callback) {
-      return _apicore(url,params,'DELETE',callback);         
-    };
-
-    VidZapperApi.prototype.delete2 = function(url,params,callback) {
-      return _apicore(url,params,'DELETE',callback,'v2');         
-    };
-
-    var _noop=function(){}
-
     var _apicore= function (url, params,method, callback,v) {
-
+        
         if (typeof params === 'function') {
             callback = params;
             params = null;
@@ -68,14 +37,16 @@ var VidZapperApi = function (opt) {
 
         var headers = {
             'user-agent': 'VidZapper Api Node JS/0.0.1',
-            'content-type': 'application/json; charset=utf-8',
-            //'accept-encoding':'gzip,deflate'
+            'content-type': 'application/json; charset=utf-8'
+        }
+        if(opt.authorization){
+            headers.authorization=opt.authorization;
         }
 
         var options = {
             method: method,
             json: {},
-            header:headers,
+            headers:headers,
             rejectUnauthorized: false
         };
 
@@ -92,8 +63,9 @@ var VidZapperApi = function (opt) {
         url = opt.server +(v==='v2'?'v2/':'')+  url;
         options.url=url;
 
-        if(!!opt.debug){
-            console.log('connecting-live',url,opt.server);
+        if(opt.debug && url.indexOf('que/progress')>-1){
+            console.log('connecting-live',url);
+            console.log('Data',options.json);
         }
 
         request(options,function(error,response,body){
@@ -123,6 +95,20 @@ var VidZapperApi = function (opt) {
                 });
             }
         });
+    };
+
+    return  {
+        init:function(cfg) {  opt=cfg; },
+        get:function(url,params,callback) { return _apicore(url,params,'GET',callback);},
+        api:function(url,params,callback) { return _apicore(url,params,'POST',callback);},
+        post:function(url,params,callback) { return _apicore(url,params,'POST',callback);},
+        get2:function(url,params,callback) { return _apicore(url,params,'GET',callback,'v2');},
+        api2:function(url,params,callback) { return _apicore(url,params,'POST',callback,'v2');},
+        post2:function(url,params,callback) { return _apicore(url,params,'POST',callback,'v2');},
+        put:function(url,params,callback) { return _apicore(url,params,'PUT',callback);},
+        put2:function(url,params,callback) { return _apicore(url,params,'PUT',callback,'v2');},
+        delete:function(url,params,callback) { return _apicore(url,params,'DELETE',callback); },
+        delete2:function(url,params,callback) { return _apicore(url,params,'DELETE',callback,'v2');}
     };
 };
 exports = module.exports = function(args) {
