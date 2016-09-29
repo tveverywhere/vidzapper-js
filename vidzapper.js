@@ -5,13 +5,20 @@ var VidZapperApi = function (opt) {
 
     var _noop=function(){}
 
+    function isSystemPermission(url){
+        if(url.indexOf('util/')>-1) return true;
+        if(url.indexOf('que/')>-1) return true;
+        if(url.indexOf('rawencoder/')>-1) return true;
+        return false;
+    }
+
     var _parseUrl = function (url,params) {
         if (!params) {
             params = "";
         } else {
             params = "?" + params;
         }
-        if(opt.authorization) return 'my/'+url + params;
+        if(opt.authorization && !isSystemPermission(url)) return 'my/'+url + params;
 
         var appKey = JSON.stringify({
             ValidTill: moment.utc().format("YYYYMMDDHHmm"),
@@ -68,7 +75,7 @@ var VidZapperApi = function (opt) {
             console.log('Data',options.json);
         }
 
-        request(options,function(error,response,body){
+        function requestCallback(error,response,body){
             if (response === null || response === undefined) {
                 callback({
                     error: true,
@@ -86,6 +93,14 @@ var VidZapperApi = function (opt) {
                     message: "Api method not found ("+fName+")",
                     url: url
                 });
+            } else if (!error && body && body.indexOf && (
+                body.indexOf('A second operation started on this context before a previous asynchronous operation completed')>-1 || 
+                body.indexOf('An exception has been raised that is likely due to a transient failure')>-1 
+            )){
+                //try again.
+                setTimeout(function(){
+                    request(options,requestCallback);
+                },100);
             } else {
                 callback({
                     error: true,
@@ -94,7 +109,9 @@ var VidZapperApi = function (opt) {
                     url: url
                 });
             }
-        });
+        }
+
+        request(options,requestCallback);
     };
 
     return  {
